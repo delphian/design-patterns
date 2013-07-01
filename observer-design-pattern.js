@@ -60,16 +60,18 @@ Observable.prototype = {
         this.subscribers[messageType].push(callback);
     },
     messageUnsubscribe: function(messageType, callback) {
-        var i = 0,
-            len = this.subscribers[messageType].length;
-        // Iterate through the array and if the callback is
-        // found, remove it from the list of subscribers.
-        for (; i < len; i++) {
-            if (this.subscribers[messageType][i] === callback) {
-                this.subscribers[messageType].splice(i, 1);
-                // Once we've found it, we don't need to
-                // continue, so just return.
-                return;
+        if (messageType in this.subscribers) {
+            var i = 0,
+                len = this.subscribers[messageType].length;
+            // Iterate through the array and if the callback is
+            // found, remove it from the list of subscribers.
+            for (; i < len; i++) {
+                if (this.subscribers[messageType][i] === callback) {
+                    this.subscribers[messageType].splice(i, 1);
+                    // Once we've found it, we don't need to
+                    // continue, so just return.
+                    return;
+                }
             }
         }
     },
@@ -89,13 +91,15 @@ Observable.prototype = {
      */
     messagePublish: function(messageType, data, observed) {
         var result = [];
-        var i = 0,
-            len = this.subscribers[messageType].length;
-        // Iterate over the subscribers array and call each of
-        // the callback functions.
-        for (; i < len; i++) {
-            var callback = this.subscribers[messageType][i];
-            result[callback] = callback(data, messageType, observed, result);
+        if (messageType in this.subscribers) {
+            var i = 0,
+                len = this.subscribers[messageType].length;
+            // Iterate over the subscribers array and call each of
+            // the callback functions.
+            for (; i < len; i++) {
+                var callback = this.subscribers[messageType][i];
+                result[callback] = callback(data, messageType, observed, result);
+            }
         }
         return (result.length) ? result : false;
     }
