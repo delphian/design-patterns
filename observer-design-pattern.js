@@ -35,13 +35,14 @@
  *   // Optionally examination the response of any observers.
  * @endcode
  */
-var Observable = function() {}
+var Observable = function() {
+    this.subscribers = [];
+}
 Observable.prototype = {
-    subscribers: [],
-    messageTypeAdd: function(messageType) {
+    typeAdd: function(messageType) {
         this.subscribers[messageType] = [];
     },
-    messageTypeRemove: function (messageType) {
+    typeRemove: function (messageType) {
         var i = 0,
             len = this.subscribers.length;
         // Iterate through the array and if the callback is
@@ -55,11 +56,11 @@ Observable.prototype = {
             }
         }
     },
-    messageSubscribe: function(messageType, callback) {
+    subscribe: function(messageType, callback) {
         // Add the callback to the message type specific callback list.
         this.subscribers[messageType].push(callback);
     },
-    messageUnsubscribe: function(messageType, callback) {
+    unsubscribe: function(messageType, callback) {
         if (messageType in this.subscribers) {
             var i = 0,
                 len = this.subscribers[messageType].length;
@@ -78,10 +79,10 @@ Observable.prototype = {
     /**
      * Send out a message to any listeners.
      *
-     * @param string messageType
-     *   The type of message being distributed.
      * @param mixed data
      *   The data being distributed.
+     * @param string messageType
+     *   The type of message being distributed.
      * @param object observed
      *   The object that is distributing the message.
      *
@@ -89,8 +90,8 @@ Observable.prototype = {
      *   false if no response was provider by observers. Otherwise an object
      *   keyed by observer callback function name.
      */
-    messagePublish: function(messageType, data, observed) {
-        var result = [];
+    publish: function(data, messageType, observed) {
+        var result = {};
         if (messageType in this.subscribers) {
             var i = 0,
                 len = this.subscribers[messageType].length;
@@ -98,9 +99,9 @@ Observable.prototype = {
             // the callback functions.
             for (; i < len; i++) {
                 var callback = this.subscribers[messageType][i];
-                result[callback] = callback(data, messageType, observed, result);
+                result[callback.name] = callback(data, messageType, observed, result);
             }
         }
-        return (result.length) ? result : false;
+        return (Object.keys(result).length) ? result : false;
     }
 };
