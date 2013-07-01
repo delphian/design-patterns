@@ -31,7 +31,8 @@
  *   // published.
  *   observable.messageSubscribe(Observer, 'generic');
  *   // Publish a message.
- *   observable.messagePublish('generic', 'We published this data!');
+ *   observable.messagePublish('generic', 'I published this data!', observable, response = []);
+ *   // Optionally examination the response of any observers.
  * @endcode
  */
 var Observable = function() {}
@@ -72,13 +73,30 @@ Observable.prototype = {
             }
         }
     },
-    messagePublish: function(messageType, data) {
+    /**
+     * Send out a message to any listeners.
+     *
+     * @param string messageType
+     *   The type of message being distributed.
+     * @param mixed data
+     *   The data being distributed.
+     * @param object observed
+     *   The object that is distributing the message.
+     *
+     * @return bool|object
+     *   false if no response was provider by observers. Otherwise an object
+     *   keyed by observer callback function name.
+     */
+    messagePublish: function(messageType, data, observed) {
+        var result = [];
         var i = 0,
             len = this.subscribers[messageType].length;
         // Iterate over the subscribers array and call each of
         // the callback functions.
         for (; i < len; i++) {
-            this.subscribers[messageType][i](data, messageType);
+            var callback = this.subscribers[messageType][i];
+            result[callback] = callback(data, messageType, observed, result);
         }
+        return (result.length) ? result : false;
     }
 };
