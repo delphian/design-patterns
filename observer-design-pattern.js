@@ -7,17 +7,17 @@
  * messages specific to a type.
  *
  * @author Bryan Hazelbaker <bryan.hazelbaker@gmail.com>
- * @version 1.0
+ * @version 0.1
  *
  * @see http://www.joezimjs.com/javascript/javascript-design-patterns-observer/
  */
- 
+
 /**
  * The Observable class.
  *
  * Instantiate this to objects that wish to be observed.
  *
- * Example:
+ * Example using Observable:
  * @code
  *   // Create the observer object. It is simply a function.
  *   var Observer = function(message, messageType) {
@@ -27,17 +27,33 @@
  *   observable = new Observable();
  *   // Create a default message type for observers to subscribe to.
  *   observable.messageTypeAdd('generic');
- *   // Subscribe the Observer previously declared to any 'generic' messages
- *   // published.
+ *   // Subscribe previously declared Observer all 'generic' messages.
  *   observable.messageSubscribe(Observer, 'generic');
  *   // Publish a message.
- *   observable.messagePublish('generic', 'I published this data!', observable, response = []);
+ *   observable.messagePublish('generic', 'I published this data!', observable);
  *   // Optionally examination the response of any observers.
+ * @endcode
+ *
+ * Example extending Observable:
+ * @code
+ *   // Declare the subclass.
+ *   var SubObserverableClass = function() {
+ *       // Call our super class constructor.
+ *       Observable.call(this)
+ *       // Register a message type.
+ *       this.typeAdd('generic');
+ *   };
+ *   // Cause our subclass to inherit methods of Observable superclass.
+ *   SubObservableClass.prototype = Observable.prototype;
+ *   // Add a new method to our new subclass.
+ *   SubObservableClass.prototype.myCustomMethod = function() {
+ *       alert('My new custom method added to existing Observable methods!');
+ *   };
  * @endcode
  */
 var Observable = function() {
     this.subscribers = [];
-}
+};
 Observable.prototype = {
     typeAdd: function(messageType) {
         this.subscribers[messageType] = [];
