@@ -136,6 +136,7 @@ Observable.prototype = {
             for (; i < len; i++) {
                 var callback = this.subscribers[messageType][i];
                 result[callback.name] = callback(data, messageType, observed, result);
+                // This loop seems to block a DOM redraw...
             }
         }
         return (Object.keys(result).length) ? result : false;
