@@ -72,7 +72,27 @@ Observable.prototype = {
             }
         }
     },
+    /**
+     * Determine if a message type exists or not.
+     *
+     * @param string messageType
+     *   Name of the message type.
+     *
+     * @return bool
+     *   true if the type exists, false otherwise.
+     */
+    typeExists: function(messageType) {
+        exists = false;
+        if (typeof(this.subscribers[messageType]) != 'undefined') {
+            exists = true;
+        }
+        return exists;
+    },
     subscribe: function(messageType, callback) {
+        // Automatically add the message type if it does not already exist.
+        if (!this.typeExists(messageType)) {
+            this.typeAdd(messageType);
+        }
         // Add the callback to the message type specific callback list.
         this.subscribers[messageType].push(callback);
     },
